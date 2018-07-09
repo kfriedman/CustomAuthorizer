@@ -1,0 +1,5 @@
+node_modules
+.lambda
+.nyc_output
+coverage
+config/local.env

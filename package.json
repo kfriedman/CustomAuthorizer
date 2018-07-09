@@ -1,0 +1,60 @@
+{
+  "name": "CustomAuthorizer",
+  "version": "0.1.0",
+  "description": "Custom NYPL authorizer for AWS API Gateway",
+  "main": "index.js",
+  "scripts": {
+    "deploy-development": "./node_modules/.bin/node-lambda deploy -e development -f ./config/development.env -S ./config/event_sources_development.json -o arn:aws:iam::224280085904:role/lambda_basic_execution -a $aws_access_key_id_development -s $aws_secret_access_key_development",
+    "deploy-production": "./node_modules/.bin/node-lambda deploy -e production -f ./config/production.env -S ./config/event_sources_production.json -o arn:aws:iam::946183545209:role/lambda-full-access -a $aws_access_key_id_production -s $aws_secret_access_key_production",
+    "bib": "./node_modules/.bin/node-lambda run -f config/local.env -j sample/events/bib.json -x sample/events/context.json",
+    "bibs": "./node_modules/.bin/node-lambda run -f config/local.env -j sample/events/bibs.json -x sample/events/context.json",
+    "create-bib": "./node_modules/.bin/node-lambda run -f config/local.env -j sample/events/create_bib.json -x sample/events/context.json",
+    "fakeroute": "./node_modules/.bin/node-lambda run -f config/local.env -j sample/events/fakeroute.json -x sample/events/context.json",
+    "patron": "./node_modules/.bin/node-lambda run -f config/local.env -j sample/events/patron.json -x sample/events/context.json",
+    "setup-node-lambda-env": "cp ./sample/.env.sample ./.env",
+    "setup-local-env": "mkdir -p config && cp ./sample/deployment.env.sample ./config/local.env",
+    "setup-development-env": "mkdir -p config && cp ./sample/deployment.env.sample ./config/development.env",
+    "setup-production-env": "mkdir -p config && cp ./sample/deployment.env.sample ./config/production.env",
+    "setup-development-sources": "cp ./sample/sample_event_sources.json ./config/event_sources_development.json",
+    "setup-production-sources": "cp ./sample/sample_event_sources.json ./config/event_sources_production.json",
+    "lint": "./node_modules/.bin/standard",
+    "test": "NODE_ENV=test ./node_modules/.bin/nyc --reporter=lcov --reporter=text ./node_modules/mocha/bin/mocha",
+    "coverage": "./node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls",
+    "coverage-report": "./node_modules/.bin/nyc report --reporter=html && npm run open-report",
+    "open-report": "open -a 'Google Chrome' ./coverage/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NYPL/nypl-authorizer.git"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "jsonwebtoken": "^8.1.0",
+    "mock-fs": "^4.4.2",
+    "node-cache": "^4.1.1",
+    "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "axios-mock-adapter": "^1.10.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "coveralls": "^3.0.0",
+    "mocha": "^4.1.0",
+    "node-lambda": "^0.11.5",
+    "nyc": "^11.4.1",
+    "sinon": "^4.3.0",
+    "standard": "^10.0.3"
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "context",
+      "before",
+      "beforeEach",
+      "after",
+      "afterEach",
+      "it",
+      "expect"
+    ]
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "type": "REQUEST",
+  "methodArn": "arn:aws:execute-api:us-east-1:224280085904:1fg5jou30a/production/GET/api/v0.1/bibs/sierra-nypl/19685617",
+  "resource": "/api/v0.1/bibs/{nyplSource}/{id}",
+  "path": "/api/v0.1/bibs/sierra-nypl/19685617",
+  "httpMethod": "GET",
+  "headers": {
+    "Origin": "https://dev-platformdocs.nypl.org",
+    "Accept": "application/json",
+    "CloudFront-Viewer-Country": "US",
+    "CloudFront-Forwarded-Proto": "https",
+    "CloudFront-Is-Tablet-Viewer": "false",
+    "CloudFront-Is-Mobile-Viewer": "false",
+    "Referer": "https://dev-platformdocs.nypl.org/",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36",
+    "X-Forwarded-Proto": "https",
+    "CloudFront-Is-SmartTV-Viewer": "false",
+    "Host": "api.nypltech.org",
+    "Accept-Encoding": "gzip, deflate, br",
+    "X-Forwarded-Port": "443",
+    "X-Amzn-Trace-Id": "Root=1-5a428124-0e5ba4ff1261563273e1be90",
+    "Via": "1.1 c58036c793b4693c3fe1da8fd362b785.cloudfront.net (CloudFront)",
+    "Authorization": "Bearer",
+    "X-Amz-Cf-Id": "GVqfCft1MjrmgUoy-Zqh4z315S3EY0mgENl3UxLOkcBgfwE9HosLgA==",
+    "X-Forwarded-For": "65.88.88.176, 204.246.168.58",
+    "Accept-Language": "en-US,en;q=0.9",
+    "CloudFront-Is-Desktop-Viewer": "true"
+  },
+  "queryStringParameters": {},
+  "pathParameters": {
+    "nyplSource": "sierra-nypl",
+    "id": "19685617"
+  },
+  "stageVariables": {},
+  "requestContext": {
+    "requestTime": "26/Dec/2017:17:04:36 +0000",
+    "path": "/api/v0.1/bibs/sierra-nypl/19685617",
+    "accountId": "224280085904",
+    "protocol": "HTTP/1.1",
+    "resourceId": "gr1lau",
+    "stage": "production",
+    "requestTimeEpoch": 1514307876248,
+    "requestId": "d9f2c1de-ea5e-11e7-b52f-513fe415131d",
+    "identity": {
+      "cognitoIdentityPoolId": null,
+      "accountId": null,
+      "cognitoIdentityId": null,
+      "caller": null,
+      "sourceIp": "65.88.88.176",
+      "accessKey": null,
+      "cognitoAuthenticationType": null,
+      "cognitoAuthenticationProvider": null,
+      "userArn": null,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36",
+      "user": null
+    },
+    "resourcePath": "/api/v0.1/patrons/123123",
+    "httpMethod": "GET",
+    "apiId": "1fg5jou30a"
+  }
+}

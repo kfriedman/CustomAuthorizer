@@ -1,0 +1,5086 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "NYPL Platform APIs",
+    "description": "Endpoints require an OpenID Connect token from the NYPL OAuth server and interact with NYPL Data Streams.\n\n*Last generated: Tue, 02 Jan 2018 16:05:13 -0500*",
+    "version": "development"
+  },
+  "host": "dev-platform.nypl.org",
+  "basePath": "\/api",
+  "schemes": [
+    "https"
+  ],
+  "securityDefinitions": {
+    "api_auth": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https:\/\/isso.nypl.org\/oauth\/authorize",
+      "tokenUrl": "https:\/\/isso.nypl.org\/oauth\/token",
+      "scopes": {
+        "openid": "",
+        "admin": "",
+        "read:bib": "",
+        "write:bib": "",
+        "read:checkin_request": "",
+        "write:checkin_request": "",
+        "read:checkout_request": "",
+        "write:checkout_request": "",
+        "read:doc": "",
+        "read:hold_request": "",
+        "write:hold_request": "",
+        "read:item": "",
+        "write:item": "",
+        "read:patron": "",
+        "write:patron": "",
+        "read:recall_request": "",
+        "write:recall_request": "",
+        "read:refile_request": "",
+        "write:refile_request": ""
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Documentation for using the Platform APIs",
+    "url": "https:\/\/docs.google.com\/document\/d\/1p3q9OT9latXqON20WDh4CNPxIShUunfGgqT163r-Caw\/edit?usp=sharing"
+  },
+  "paths": {
+    "\/v0.1\/auth\/patron\/tokens\/{token}": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Get a Patron's Token information",
+        "operationId": "getToken",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "description": "Token",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/TokenResponse"
+            }
+          },
+          "401": {
+            "description": "Invalid or expired token",
+            "schema": {
+              "$ref": "#\/definitions\/AuthErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/bibs": {
+      "get": {
+        "tags": [
+          "bibs"
+        ],
+        "summary": "Get a list of Bibs",
+        "operationId": "getBibs",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Separate multiple IDs with a comma",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "nyplSource",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/BibsResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid read:bib"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "bibs"
+        ],
+        "summary": "Create new Bibs",
+        "operationId": "createBib",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewBib",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#\/definitions\/NewBib"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/BulkBibsResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid write:bib"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/bibs\/{nyplSource}\/{id}": {
+      "get": {
+        "tags": [
+          "bibs"
+        ],
+        "summary": "Get a Bib",
+        "operationId": "getBib",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "nyplSource",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/BibResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid read:bib",
+              "test:scope"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/bibs\/{nyplSource}\/{id}\/items": {
+      "get": {
+        "tags": [
+          "bibs"
+        ],
+        "summary": "Get items for a Bib",
+        "operationId": "getBibItems",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "nyplSource",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/ItemsResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid read:item"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "bibs"
+        ],
+        "summary": "Create a new Item for a Bib",
+        "operationId": "createBibItem",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "nyplSource",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "NewBibItem",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/NewBibItem"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/ItemResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid write:item"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/checkin-requests": {
+      "post": {
+        "tags": [
+          "checkin-requests"
+        ],
+        "summary": "Process a checkin request",
+        "operationId": "processCheckinRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewCheckinRequest",
+            "in": "body",
+            "description": "Request object based on the included data model",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/NewCheckinRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/CheckinRequestResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/CheckinRequestErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/CheckinRequestErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api write:hold_request readwrite:hold_request"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/checkout-requests": {
+      "post": {
+        "tags": [
+          "checkout-requests"
+        ],
+        "summary": "Process a checkout request",
+        "operationId": "processCheckoutRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewCheckoutRequest",
+            "in": "body",
+            "description": "Request object based on the included data model",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/NewCheckoutRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/CheckoutRequestResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/CheckoutRequestErrorResponse"
+            }
+          },
+          "406": {
+            "description": "Not accepted",
+            "schema": {
+              "$ref": "#\/definitions\/CheckoutRequestErrorResponse"
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "schema": {
+              "$ref": "#\/definitions\/CheckoutRequestErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/CheckoutRequestErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api write:hold_request readwrite:hold_request"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/current-schemas": {
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Get a list of current Schemas",
+        "operationId": "getCurrentSchemas",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "stream",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#\/definitions\/SchemasResponse"
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/current-schemas\/{stream}": {
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Get a current Schema",
+        "operationId": "getCurrentSchema",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "stream",
+            "in": "path",
+            "description": "Name of Stream",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/SchemaResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/discovery\/resources": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Search resources",
+        "description": "Match by keyword\n\n> `\/resources?q=war peace`\n\nFilters are applied using a `filters` param that expects this syntax on the query string:\n\n> \/resources?filters[property1]=value1&filters[property2]=value2\n\nWhere `property*` is one of: \n\n> 'owner', 'subjectLiteral', 'holdingLocation', 'deliveryLocation', 'language', 'materialType', 'mediaType', 'carrierType', 'publisher', 'contributor', 'creator', 'issuance', 'createdYear', 'dateAfter', or 'dateBefore'.\n\nSee [the app README for more examples](https:\/\/github.com\/NYPL-discovery\/discovery-api\/blob\/master\/README.md)\n",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Terms to match (and\/or structured ES \"Query String Query\" https:\/\/www.elastic.co\/guide\/en\/elasticsearch\/reference\/current\/query-dsl-query-string-query.html#query-string-syntax )",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number to return",
+            "required": false,
+            "type": "integer",
+            "minimum": 1
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of results to return",
+            "required": false,
+            "type": "integer",
+            "default": 50,
+            "maximum": 100,
+            "minimum": 1
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Specify how to order results (relevance, title, creator, date)",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "relevance",
+              "title",
+              "creator",
+              "date"
+            ],
+            "default": "relevance"
+          },
+          {
+            "name": "sort_direction",
+            "in": "query",
+            "description": "Override the default direction for the current sort (asc, desc). Default depends on the field.",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          {
+            "name": "search_scope",
+            "in": "query",
+            "description": "Specify what (group of) fields to match against (all, title, contributor, subject, series, callnumber)",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "all",
+              "title",
+              "contributor",
+              "subject",
+              "series",
+              "callnumber"
+            ],
+            "default": "all"
+          },
+          {
+            "name": "filters[*]",
+            "in": "query",
+            "description": "Specify a hash of filters to apply, where key is: 'owner', 'subjectLiteral', 'holdingLocation', 'deliveryLocation', 'language', 'materialType', 'mediaType', 'carrierType', 'publisher', 'contributor', 'creator', 'issuance', 'createdYear', 'dateAfter', or 'dateBefore'",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of resources",
+            "schema": {
+              "$ref": "#\/definitions\/ResourcesResponse"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#\/definitions\/ResourceError"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path\/2015-03-31\/functions\/arn:aws:lambda:us-east-1:224280085904:function:discovery-api\/invocations",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "cacheKeyParameters": [
+            "method.request.querystring.q",
+            "method.request.querystring.search_scope",
+            "method.request.querystring.page",
+            "method.request.querystring.per_page",
+            "method.request.querystring.sort",
+            "method.request.querystring.sort_direction"
+          ]
+        }
+      }
+    },
+    "\/v0.1\/discovery\/resources\/aggregation\/{id}": {
+      "get": {
+        "summary": "Get a specific resources aggregation",
+        "description": "Fetch a specific resources search aggregation. This provides ability to consume the long tail of values for a given aggregation.\n",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "Identifies field being aggregated, e.g. \"language\""
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Terms to match (and\/or structured ES \"Query String Query\" https:\/\/www.elastic.co\/guide\/en\/elasticsearch\/reference\/current\/query-dsl-query-string-query.html#query-string-syntax )",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number to return",
+            "required": false,
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Number of results to return",
+            "required": false,
+            "type": "integer",
+            "default": 50,
+            "maximum": 100,
+            "minimum": 1
+          },
+          {
+            "name": "search_scope",
+            "in": "query",
+            "description": "Specify what (group of) fields to match against",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "all",
+              "title",
+              "contributor",
+              "subject",
+              "series",
+              "callnumber"
+            ],
+            "default": "all"
+          }
+        ],
+        "tags": [
+          "discovery"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of resources search aggregations",
+            "schema": {
+              "$ref": "#\/definitions\/ResourceAggregationResponse"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#\/definitions\/ResourceError"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path\/2015-03-31\/functions\/arn:aws:lambda:us-east-1:224280085904:function:discovery-api\/invocations",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "cacheKeyParameters": [
+            "method.request.querystring.q",
+            "method.request.querystring.search_scope",
+            "method.request.querystring.page",
+            "method.request.querystring.per_page",
+            "method.request.querystring.sort",
+            "method.request.querystring.sort_direction",
+            "method.request.path.id"
+          ],
+          "contentHandling": "CONVERT_TO_TEXT"
+        }
+      }
+    },
+    "\/v0.1\/discovery\/resources\/aggregations": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Resource Search Aggregations",
+        "description": "Fetch resources search aggregations.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Terms to match (and\/or structured ES \"Query String Query\" https:\/\/www.elastic.co\/guide\/en\/elasticsearch\/reference\/current\/query-dsl-query-string-query.html#query-string-syntax )",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "search_scope",
+            "in": "query",
+            "description": "Specify what (group of) fields to match against",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "all",
+              "title",
+              "contributor",
+              "subject",
+              "series",
+              "callnumber"
+            ],
+            "default": "all"
+          },
+          {
+            "name": "filters[*]",
+            "in": "query",
+            "description": "Specify a hash of filters to apply, where key is: 'owner', 'subjectLiteral', 'holdingLocation', 'deliveryLocation', 'language', 'materialType', 'mediaType', 'carrierType', 'publisher', 'contributor', 'creator', 'issuance', 'createdYear', 'dateAfter', or 'dateBefore'",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of resources search aggregations",
+            "schema": {
+              "$ref": "#\/definitions\/ResourceAggregationsResponse"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#\/definitions\/ResourceError"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path\/2015-03-31\/functions\/arn:aws:lambda:us-east-1:224280085904:function:discovery-api\/invocations",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "cacheKeyParameters": [
+            "method.request.querystring.q",
+            "method.request.querystring.search_scope",
+            "method.request.querystring.filters",
+            "method.request.querystring.per_page"
+          ]
+        }
+      }
+    },
+    "\/v0.1\/discovery\/resources\/{id}": {
+      "get": {
+        "summary": "Fetch a resource by ID",
+        "description": "Fetch a resource. Note alternate response formats:\n\n`.ntriples, .turtle, .jsonld (default)`\n",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "discovery"
+        ],
+        "responses": {
+          "200": {
+            "description": "A single resource",
+            "schema": {
+              "$ref": "#\/definitions\/Resource"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#\/definitions\/ResourceError"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "uri": "arn:aws:apigateway:us-east-1:lambda:path\/2015-03-31\/functions\/arn:aws:lambda:us-east-1:224280085904:function:discovery-api\/invocations",
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "POST",
+          "type": "aws_proxy",
+          "cacheKeyParameters": [
+            "method.request.path.id"
+          ]
+        }
+      }
+    },
+    "\/v0.1\/discovery\/tests\/requests": {
+      "post": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Create a test Bib or Item retrieval request",
+        "operationId": "createRequestTest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "RetrievalRequestTest",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/RetrievalRequestTest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/docs": {
+      "get": {
+        "tags": [
+          "docs"
+        ],
+        "summary": "Get and generate new Platform API documentation",
+        "operationId": "getDocs",
+        "produces": [
+          "application\/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid read:doc"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/hold-requests": {
+      "get": {
+        "tags": [
+          "hold-requests"
+        ],
+        "summary": "Get a list of hold requests",
+        "operationId": "getHoldRequests",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "patron",
+            "in": "query",
+            "description": "ID of patron provided by ILS",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "record",
+            "in": "query",
+            "description": "ID of record provided by ILS",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "processed",
+            "in": "query",
+            "description": "Process status of a hold request.",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "createdDate",
+            "in": "query",
+            "description": "Creation date of a hold request. (Format: YYYY-MM-DD)",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestsResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "hold-requests"
+        ],
+        "summary": "Create new hold request",
+        "operationId": "createHoldRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewHoldRequest",
+            "in": "body",
+            "description": "Request object based on the included data model",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/NewHoldRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/hold-requests\/{id}": {
+      "get": {
+        "tags": [
+          "hold-requests"
+        ],
+        "summary": "Get a single hold request",
+        "operationId": "getHoldRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of hold request",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "hold-requests"
+        ],
+        "summary": "Update a hold request",
+        "operationId": "updateHoldRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of hold request",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "HoldRequest",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/HoldRequestErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/items": {
+      "get": {
+        "tags": [
+          "items"
+        ],
+        "summary": "Get a list of Items",
+        "operationId": "getItems",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Separate multiple IDs with a comma",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "nyplSource",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "bibId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/ItemsResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid read:item"
+            ]
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "items"
+        ],
+        "summary": "Create new Items",
+        "operationId": "createItem",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewItem",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#\/definitions\/NewItem"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/BulkItemsResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid write:item"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/items\/{nyplSource}\/{id}": {
+      "get": {
+        "tags": [
+          "items"
+        ],
+        "summary": "Get an Item",
+        "operationId": "getItem",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "nyplSource",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/ItemResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid read:item"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/jobs": {
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Create a new Job",
+        "operationId": "createJob",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewJob",
+            "in": "body",
+            "description": "",
+            "required": false,
+            "schema": {
+              "$ref": "#\/definitions\/NewJob"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/JobResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/jobs\/{id}": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Get a Job",
+        "operationId": "getJob",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of Job",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/JobResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Error",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#\/definitions\/ErrorResponse"
+              }
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/jobs\/{id}\/failure": {
+      "put": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Set a Job to failure",
+        "operationId": "setJobFailure",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of Job",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "JobStatus",
+            "in": "body",
+            "description": "",
+            "schema": {
+              "$ref": "#\/definitions\/JobStatus"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Error"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/jobs\/{id}\/notices": {
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Create a new Job Notice",
+        "operationId": "createJobNotice",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of Job",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "JobNotice",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/JobNotice"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Error"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/jobs\/{id}\/start": {
+      "put": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Start a Job",
+        "operationId": "startJob",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of Job",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "JobStatus",
+            "in": "body",
+            "description": "",
+            "schema": {
+              "$ref": "#\/definitions\/JobStatus"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "409": {
+            "description": "Already started"
+          }
+        }
+      }
+    },
+    "\/v0.1\/jobs\/{id}\/success": {
+      "put": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Set a Job to success",
+        "operationId": "setJobSuccess",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of Job",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "JobSuccessStatus",
+            "in": "body",
+            "description": "",
+            "schema": {
+              "$ref": "#\/definitions\/JobSuccessStatus"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Error"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/patrons": {
+      "get": {
+        "tags": [
+          "patrons"
+        ],
+        "summary": "Get Patrons",
+        "operationId": "getPatrons",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/PatronsResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api read:patron readwrite:patron"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/patrons\/{id}": {
+      "get": {
+        "tags": [
+          "patrons"
+        ],
+        "summary": "Get a Patron",
+        "operationId": "getPatron",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of Patron",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/PatronResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api read:patron readwrite:patron"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/patrons\/{id}\/barcode": {
+      "get": {
+        "tags": [
+          "patrons"
+        ],
+        "summary": "Get a Patron's barcode",
+        "operationId": "getBarcode",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of Patron",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "includeImage",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "height",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "factor",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/BarcodeResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/recap\/cancel-hold-requests": {
+      "post": {
+        "tags": [
+          "recap-hold-requests"
+        ],
+        "summary": "Cancel a ReCAP hold request",
+        "operationId": "cancelRecapHoldRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewRecapCancelHoldRequest",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/NewRecapCancelHoldRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/RecapCancelHoldRequestResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api readwrite:hold_request"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/recap\/cancel-hold-requests\/{id}": {
+      "patch": {
+        "tags": [
+          "recap-hold-requests"
+        ],
+        "summary": "Update a ReCAP cancel hold request",
+        "operationId": "updateCancelRecapHoldRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of ReCAP cancel hold request",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "RecapCancelHoldRequest",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/RecapCancelHoldRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/RecapCancelHoldRequestResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/recap\/hold-requests": {
+      "post": {
+        "tags": [
+          "recap-hold-requests"
+        ],
+        "summary": "Create a new ReCAP hold request",
+        "operationId": "createRecapHoldRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewRecapHoldRequest",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/NewRecapHoldRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/RecapHoldRequestResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api readwrite:hold_request"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/recap\/nypl-bibs": {
+      "get": {
+        "tags": [
+          "recap"
+        ],
+        "summary": "Get SCSB XML for a Sierra Bib",
+        "description": "Translate a Sierra Bib and associated Items MARC records into ReCAP SCSB XML (see: https:\/\/htcrecap.atlassian.net\/wiki\/spaces\/RTG\/pages\/27691070\/XML+Schema)",
+        "produces": [
+          "text\/xml",
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "customerCode",
+            "in": "query",
+            "description": "ReCAP customer code to use for associated Item(s)",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "barcode",
+            "in": "query",
+            "description": "Lookup the Bib by an associated Item barcode",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "bibId",
+            "in": "query",
+            "description": "Lookup the Bib by the Bib ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "includeFullBibTree",
+            "in": "query",
+            "description": "Return the full Bib tree (i.e. all Items) for the Bib",
+            "required": false,
+            "type": "boolean",
+            "default": "false"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response in SCSB XML format"
+          },
+          "500": {
+            "description": "Error message in JSON format"
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "read:bib read:item"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/recap\/recall-requests": {
+      "post": {
+        "tags": [
+          "recap"
+        ],
+        "summary": "Create a ReCAP Recall Request",
+        "operationId": "createRecallRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewRecapRecallRequest",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/NewRecapRecallRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/RecapRecallRequestResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/recap\/refile-requests": {
+      "post": {
+        "tags": [
+          "recap"
+        ],
+        "summary": "Create a ReCAP Refile Request",
+        "operationId": "createRefileRequest",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "NewRecapRefileRequest",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/NewRecapRefileRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/RecapRefileRequestResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/request\/deliveryLocationsByBarcode": {
+      "get": {
+        "summary": "Get items mapped to deliveryLocation(s) by barcode(s)",
+        "description": "Accepts multiple item barcodes, returns a special serialization of those items with an array of deliveryLocation objects.",
+        "parameters": [
+          {
+            "name": "barcodes[]",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Item barcode(s) to match. There can be multiple of them (e.g ?barcodes[]=123&barcodes[]=456)"
+          },
+          {
+            "name": "patronId",
+            "in": "query",
+            "type": "string",
+            "description": "Patron ID, whose patron type will govern visibility of certain delivery locations."
+          }
+        ],
+        "tags": [
+          "request"
+        ],
+        "responses": {
+          "200": {
+            "description": "An array of items",
+            "schema": {
+              "$ref": "#\/definitions\/Item"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#\/definitions\/ResourceError"
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "passthroughBehavior": "when_no_match",
+          "httpMethod": "GET",
+          "type": "http",
+          "cacheKeyParameters": [
+            "method.request.querystring.barcodes",
+            "method.request.querystring.patronId"
+          ],
+          "contentHandling": "CONVERT_TO_TEXT"
+        },
+        "security": [
+          {
+            "api_auth": [
+              "read:patron"
+            ]
+          }
+        ]
+      }
+    },
+    "\/v0.1\/schemas": {
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Get a list of Schemas",
+        "operationId": "getSchemas",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "stream",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fromOffset",
+            "in": "query",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#\/definitions\/SchemasResponse"
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/schemas\/{id}": {
+      "get": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Get a Schema",
+        "operationId": "getSchema",
+        "consumes": [
+          "application\/json"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of Schema",
+            "required": true,
+            "type": "integer",
+            "format": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/SchemaResponse"
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "\/v0.1\/schemas\/{stream}": {
+      "post": {
+        "tags": [
+          "schemas"
+        ],
+        "summary": "Create a new Schema",
+        "operationId": "createSchema",
+        "consumes": [
+          "text\/plain"
+        ],
+        "produces": [
+          "application\/json"
+        ],
+        "parameters": [
+          {
+            "name": "stream",
+            "in": "path",
+            "description": "Name of Stream",
+            "required": true,
+            "type": "string",
+            "format": "string"
+          },
+          {
+            "name": "schema",
+            "in": "body",
+            "description": "",
+            "required": true,
+            "schema": {
+              "$ref": "#\/definitions\/PostSchema"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "$ref": "#\/definitions\/SchemaResponse"
+            }
+          },
+          "500": {
+            "description": "Generic server error",
+            "schema": {
+              "$ref": "#\/definitions\/ErrorResponse"
+            }
+          }
+        },
+        "security": [
+          {
+            "api_auth": [
+              "openid offline_access api"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "checkin-requests",
+      "description": "Checkin Request API"
+    },
+    {
+      "name": "checkout-requests",
+      "description": "Checkout Request API"
+    },
+    {
+      "name": "discovery",
+      "description": "Discovery API"
+    },
+    {
+      "name": "hold-requests",
+      "description": "Hold Request API"
+    },
+    {
+      "name": "recap",
+      "description": "ReCAP API"
+    },
+    {
+      "name": "recap-hold-requests",
+      "description": "ReCAP Hold Request API"
+    },
+    {
+      "name": "recap",
+      "description": "ReCAP Refile Request API"
+    }
+  ],
+  "definitions": {
+    "Aggregation": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "enum": [
+            "nypl:Aggregation"
+          ]
+        },
+        "@id": {
+          "type": "string",
+          "description": "Identifies field being aggregated"
+        },
+        "field": {
+          "type": "string",
+          "description": "Identifies field being aggregated"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/AggregationValue"
+          }
+        }
+      }
+    },
+    "AggregationValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "term aggregated"
+        },
+        "count": {
+          "type": "integer",
+          "description": "number of records matching term"
+        }
+      }
+    },
+    "AuthErrorResponse": {
+      "title": "AuthErrorResponse",
+      "properties": {
+        "expired": {
+          "type": "boolean",
+          "example": false
+        }
+      },
+      "type": "object"
+    },
+    "AuthPatron": {
+      "title": "AuthPatron",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "5852922"
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "barCodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "BarcodeResponse": {
+      "title": "BarcodeResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/PatronBarcode"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "BaseCheckinRequest": {
+      "properties": {
+        "itemBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "NYPL"
+        }
+      },
+      "type": "object"
+    },
+    "BaseCheckoutRequest": {
+      "properties": {
+        "patronBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "NYPL"
+        },
+        "desiredDateDue": {
+          "type": "string",
+          "example": "2016-04-12T04:00:00.000-08:00"
+        }
+      },
+      "type": "object"
+    },
+    "BaseSchema": {
+      "title": "Schema",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "stream": {
+          "type": "string",
+          "example": "Bib"
+        },
+        "schema": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Bib": {
+      "title": "Bib",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "17746307"
+        },
+        "nyplSource": {
+          "type": "string",
+          "example": "sierra-nypl"
+        },
+        "nyplType": {
+          "type": "string",
+          "example": "bib"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "deletedDate": {
+          "type": "string",
+          "example": "2008-12-24"
+        },
+        "deleted": {
+          "type": "boolean",
+          "example": false
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Location"
+          }
+        },
+        "suppressed": {
+          "type": "boolean",
+          "example": false
+        },
+        "lang": {
+          "$ref": "#\/definitions\/Language"
+        },
+        "title": {
+          "type": "string",
+          "example": "Harry Potter and the Chamber of Secrets"
+        },
+        "author": {
+          "type": "string",
+          "example": "Rowling, J. K."
+        },
+        "materialType": {
+          "$ref": "#\/definitions\/MaterialType"
+        },
+        "bibLevel": {
+          "$ref": "#\/definitions\/BibLevel"
+        },
+        "publishYear": {
+          "type": "integer",
+          "example": 1999
+        },
+        "catalogDate": {
+          "type": "string",
+          "example": "2008-12-24"
+        },
+        "country": {
+          "$ref": "#\/definitions\/Country"
+        },
+        "normTitle": {
+          "type": "string"
+        },
+        "normAuthor": {
+          "type": "string"
+        },
+        "fixedFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/FixedField"
+          }
+        },
+        "varFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/VarField"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "BibLevel": {
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "m"
+        },
+        "value": {
+          "type": "string",
+          "example": "MONOGRAPH"
+        }
+      },
+      "type": "object"
+    },
+    "BibResponse": {
+      "title": "BibResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/Bib"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "BibsResponse": {
+      "title": "BibsResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Bib"
+          }
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "BulkBibsResponse": {
+      "title": "BibsResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Bib"
+          }
+        },
+        "count": {
+          "type": "int",
+          "example": 1
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/BulkError"
+          }
+        },
+        "statusCode": {
+          "type": "int",
+          "example": 200
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "BulkError": {
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string",
+          "example": "Description of error"
+        },
+        "data": {
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "name": "BulkError"
+    },
+    "BulkItemsResponse": {
+      "title": "BibsResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Item"
+          }
+        },
+        "count": {
+          "type": "int",
+          "example": 1
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/BulkError"
+          }
+        },
+        "statusCode": {
+          "type": "int",
+          "example": 200
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Checkin": {
+      "title": "Item",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "13453452"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "patronBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        }
+      },
+      "type": "object"
+    },
+    "CheckinRequest": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 124
+        },
+        "jobId": {
+          "type": "string",
+          "example": "5aaa1212cd"
+        },
+        "processed": {
+          "type": "boolean",
+          "example": false
+        },
+        "success": {
+          "type": "boolean",
+          "example": false
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "NYPL"
+        }
+      },
+      "type": "object"
+    },
+    "CheckinRequestErrorResponse": {
+      "title": "CheckinRequestErrorResponse",
+      "properties": {
+        "statusCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string",
+          "example": "error_type"
+        },
+        "message": {
+          "type": "string",
+          "example": "Description of error"
+        },
+        "error": {
+          "type": "object"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "CheckinRequestResponse": {
+      "title": "CheckoutRequestResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/CheckinRequest"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "CheckinRequestsResponse": {
+      "title": "CheckoutRequestResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/CheckinRequest"
+          }
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "CheckinResponse": {
+      "title": "CheckoutResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/Checkin"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "CheckinsResponse": {
+      "title": "CheckoutsResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Checkin"
+          }
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Checkout": {
+      "title": "Item",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "patron": {
+          "type": "string",
+          "example": "10004854"
+        },
+        "id": {
+          "type": "string",
+          "example": "13453452"
+        },
+        "item": {
+          "type": "string",
+          "example": "17746307"
+        },
+        "barcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "dueDate": {
+          "type": "string",
+          "example": "2013-03-20"
+        },
+        "callNumber": {
+          "type": "string",
+          "example": "|h*ONPA 84-446"
+        },
+        "numberOfRenewals": {
+          "type": "integer",
+          "example": 0
+        },
+        "outDate": {
+          "type": "string",
+          "example": "2013-03-20"
+        },
+        "recallDate": {
+          "type": "string",
+          "example": "2013-03-20"
+        }
+      },
+      "type": "object"
+    },
+    "CheckoutRequest": {
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 124
+        },
+        "jobId": {
+          "type": "string",
+          "example": "5aaa1212cd"
+        },
+        "processed": {
+          "type": "boolean",
+          "example": false
+        },
+        "success": {
+          "type": "boolean",
+          "example": false
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "patronBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "NYPL"
+        },
+        "desiredDateDue": {
+          "type": "string",
+          "example": "2016-04-12T04:00:00.000-08:00"
+        }
+      },
+      "type": "object"
+    },
+    "CheckoutRequestErrorResponse": {
+      "title": "CheckoutRequestErrorResponse",
+      "properties": {
+        "statusCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string",
+          "example": "error_type"
+        },
+        "message": {
+          "type": "string",
+          "example": "Description of error"
+        },
+        "error": {
+          "type": "object"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "CheckoutRequestResponse": {
+      "title": "CheckoutRequestResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/CheckoutRequest"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "CheckoutRequestsResponse": {
+      "title": "CheckoutRequestResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/CheckoutRequest"
+          }
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "CheckoutResponse": {
+      "title": "CheckoutResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/Checkout"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "CheckoutsResponse": {
+      "title": "CheckoutsResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Checkout"
+          }
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Country": {
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "nyu"
+        },
+        "name": {
+          "type": "string",
+          "example": "New York (State)"
+        }
+      },
+      "type": "object"
+    },
+    "DecodedToken": {
+      "title": "DecodedToken",
+      "properties": {
+        "iss": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org"
+        },
+        "sub": {
+          "type": "string",
+          "example": "123123"
+        },
+        "aud": {
+          "type": "string",
+          "example": "app_api"
+        },
+        "iat": {
+          "type": "string",
+          "example": "1477706776"
+        },
+        "exp": {
+          "type": "string",
+          "example": "1477706776"
+        },
+        "auth_time": {
+          "type": "string",
+          "example": "1477706776"
+        },
+        "scope": {
+          "type": "string",
+          "example": "openid patron:read"
+        }
+      },
+      "type": "object"
+    },
+    "ElectronicDocumentData": {
+      "title": "ElectronicDocumentRequest",
+      "properties": {
+        "emailAddress": {
+          "type": "string",
+          "example": "user@example.com"
+        },
+        "chapterTitle": {
+          "type": "string",
+          "example": "Chapter One"
+        },
+        "startPage": {
+          "type": "string",
+          "example": "100"
+        },
+        "endPage": {
+          "type": "string",
+          "example": "150"
+        },
+        "author": {
+          "type": "string",
+          "example": "Anonymous"
+        },
+        "issue": {
+          "type": "string",
+          "example": "Summer 2017"
+        },
+        "volume": {
+          "type": "string",
+          "example": "159"
+        },
+        "requestNotes": {
+          "type": "string",
+          "example": "Backup physical delivery requested."
+        }
+      },
+      "type": "object"
+    },
+    "EntityStub": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        },
+        "@id": {
+          "type": "string"
+        },
+        "prefLabel": {
+          "type": "string",
+          "description": "Friendly label for this entity"
+        }
+      }
+    },
+    "ErrorResponse": {
+      "properties": {
+        "statusCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string",
+          "example": "error_type"
+        },
+        "message": {
+          "type": "string",
+          "example": "Description of error"
+        },
+        "error": {
+          "type": "object"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object",
+      "name": "ErrorResponse"
+    },
+    "FixedField": {
+      "required": [
+        "label"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "example": "Language"
+        },
+        "value": {
+          "type": "string",
+          "example": "eng"
+        },
+        "display": {
+          "type": "string",
+          "example": "English"
+        }
+      },
+      "type": "object"
+    },
+    "HoldRequest": {
+      "title": "HoldRequest",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": "229"
+        },
+        "jobId": {
+          "type": "string",
+          "example": "901bdd1d-bd8f-4310-ba31-7f13a55877fd"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2018-01-07T02:32:51Z"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2018-01-07T02:32:51Z"
+        },
+        "success": {
+          "type": "boolean",
+          "example": true
+        },
+        "processed": {
+          "type": "boolean",
+          "example": false
+        },
+        "patron": {
+          "type": "string",
+          "example": "6779366"
+        },
+        "nyplSource": {
+          "type": "string",
+          "example": "sierra-nypl"
+        },
+        "requestType": {
+          "type": "string",
+          "example": "hold"
+        },
+        "recordType": {
+          "type": "string",
+          "example": "i"
+        },
+        "record": {
+          "type": "string",
+          "example": "10011630"
+        },
+        "pickupLocation": {
+          "type": "string",
+          "example": "mal"
+        },
+        "deliveryLocation": {
+          "type": "string",
+          "example": "NW"
+        },
+        "neededBy": {
+          "type": "string",
+          "example": "2018-01-07T02:32:51Z"
+        },
+        "numberOfCopies": {
+          "type": "integer",
+          "example": "1"
+        },
+        "docDeliveryData": {
+          "$ref": "#\/definitions\/ElectronicDocumentData"
+        }
+      },
+      "type": "object"
+    },
+    "HoldRequestErrorResponse": {
+      "title": "HoldRequestErrorResponse",
+      "properties": {
+        "statusCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string",
+          "example": "error_type"
+        },
+        "message": {
+          "type": "string",
+          "example": "Description of error"
+        },
+        "error": {
+          "type": "object"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "HoldRequestResponse": {
+      "title": "HoldRequestResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/HoldRequest"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "HoldRequestsResponse": {
+      "title": "HoldRequestsResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/HoldRequest"
+          }
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Item": {
+      "title": "Item",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "nyplSource": {
+          "type": "string",
+          "example": "sierra-nypl"
+        },
+        "bibIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string",
+          "example": "17746307"
+        },
+        "nyplType": {
+          "type": "string",
+          "example": "item"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "deletedDate": {
+          "type": "string",
+          "example": "2008-12-24"
+        },
+        "deleted": {
+          "type": "boolean",
+          "example": false
+        },
+        "location": {
+          "$ref": "#\/definitions\/Location"
+        },
+        "status": {
+          "$ref": "#\/definitions\/ItemStatus"
+        },
+        "barcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "callNumber": {
+          "type": "string",
+          "example": "|h*ONPA 84-446"
+        },
+        "itemType": {
+          "type": "string",
+          "example": "Book, paperback"
+        },
+        "fixedFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/FixedField"
+          }
+        },
+        "varFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/VarField"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "ItemDescription": {
+      "title": "ItemDescription",
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Some sing, some cry"
+        },
+        "author": {
+          "type": "string",
+          "example": "Ifa Bayeza"
+        },
+        "callNumber": {
+          "type": "string",
+          "example": "|h*ONPA 84-446"
+        }
+      },
+      "type": "object"
+    },
+    "ItemResponse": {
+      "title": "ItemResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/Item"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "ItemStatus": {
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "-"
+        },
+        "display": {
+          "type": "string",
+          "example": "AVAILABLE"
+        },
+        "duedate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        }
+      },
+      "type": "object"
+    },
+    "ItemsResponse": {
+      "title": "ItemsResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Item"
+          }
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Job": {
+      "title": "Job",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "37580c4174e059a"
+        },
+        "started": {
+          "type": "boolean",
+          "example": false
+        },
+        "finished": {
+          "type": "boolean",
+          "example": false
+        },
+        "success": {
+          "type": "boolean",
+          "example": false
+        },
+        "notices": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/JobNoticeCreated"
+          }
+        },
+        "successRedirectUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/item\/121"
+        },
+        "startCallbackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        },
+        "successCallbackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        },
+        "failureCallbackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        },
+        "updateCallbackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        }
+      },
+      "type": "object"
+    },
+    "JobNotice": {
+      "properties": {
+        "text": {
+          "type": "string",
+          "example": "Processing has started..."
+        },
+        "data": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "JobNoticeCreated": {
+      "properties": {
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "text": {
+          "type": "string",
+          "example": "Processing has started..."
+        },
+        "data": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "JobResponse": {
+      "title": "JobResponse",
+      "properties": {
+        "data": [],
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "JobStatus": {
+      "properties": {
+        "notice": {
+          "$ref": "#\/definitions\/JobNoticeCreated"
+        },
+        "callBackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        },
+        "callBackData": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "JobSuccessStatus": {
+      "properties": {
+        "successRedirectUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/id\/12121"
+        },
+        "notice": {
+          "$ref": "#\/definitions\/JobNoticeCreated"
+        },
+        "callBackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        },
+        "callBackData": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Language": {
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "eng"
+        },
+        "name": {
+          "type": "string",
+          "example": "English"
+        }
+      },
+      "type": "object"
+    },
+    "Location": {
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "rcma2"
+        },
+        "name": {
+          "type": "string",
+          "example": "OFFSITE - Request in Advance"
+        }
+      },
+      "type": "object"
+    },
+    "MaterialType": {
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "example": "a"
+        },
+        "value": {
+          "type": "string",
+          "example": "BOOK\/TEXT"
+        }
+      },
+      "type": "object"
+    },
+    "NewBib": {
+      "required": [
+        "sourceCode"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "17746307"
+        },
+        "nyplSource": {
+          "type": "string",
+          "example": "sierra-nypl"
+        },
+        "nyplType": {
+          "type": "string",
+          "example": "bib"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "deletedDate": {
+          "type": "string",
+          "example": "2008-12-24"
+        },
+        "deleted": {
+          "type": "boolean",
+          "example": false
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Location"
+          }
+        },
+        "suppressed": {
+          "type": "boolean",
+          "example": false
+        },
+        "lang": {
+          "$ref": "#\/definitions\/Language"
+        },
+        "title": {
+          "type": "string",
+          "example": "Harry Potter and the Chamber of Secrets"
+        },
+        "author": {
+          "type": "string",
+          "example": "Rowling, J. K."
+        },
+        "materialType": {
+          "$ref": "#\/definitions\/MaterialType"
+        },
+        "bibLevel": {
+          "$ref": "#\/definitions\/BibLevel"
+        },
+        "publishYear": {
+          "type": "integer",
+          "example": 1999
+        },
+        "catalogDate": {
+          "type": "string",
+          "example": "2008-12-24"
+        },
+        "country": {
+          "$ref": "#\/definitions\/Country"
+        },
+        "normTitle": {
+          "type": "string"
+        },
+        "normAuthor": {
+          "type": "string"
+        },
+        "fixedFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/FixedField"
+          }
+        },
+        "varFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/VarField"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "NewBibItem": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "17746307"
+        },
+        "nyplType": {
+          "type": "string",
+          "example": "item"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "deletedDate": {
+          "type": "string",
+          "example": "2008-12-24"
+        },
+        "deleted": {
+          "type": "boolean",
+          "example": false
+        },
+        "location": {
+          "$ref": "#\/definitions\/Location"
+        },
+        "status": {
+          "$ref": "#\/definitions\/ItemStatus"
+        },
+        "barcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "callNumber": {
+          "type": "string",
+          "example": "|h*ONPA 84-446"
+        },
+        "itemType": {
+          "type": "string",
+          "example": "Book, paperback"
+        },
+        "fixedFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/FixedField"
+          }
+        },
+        "varFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/VarField"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "NewCheckin": {
+      "required": [
+        "itemBarcode",
+        "patronBarcode"
+      ],
+      "properties": {
+        "itemBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "patronBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        }
+      },
+      "type": "object"
+    },
+    "NewCheckinRequest": {
+      "required": [
+        "itemBarcode"
+      ],
+      "properties": {
+        "itemBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "NYPL"
+        }
+      },
+      "type": "object"
+    },
+    "NewCheckout": {
+      "properties": {
+        "patron": {
+          "type": "string",
+          "example": "10004854"
+        },
+        "id": {
+          "type": "string",
+          "example": "13453452"
+        },
+        "item": {
+          "type": "string",
+          "example": "17746307"
+        },
+        "barcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "dueDate": {
+          "type": "string",
+          "example": "2013-03-20"
+        },
+        "callNumber": {
+          "type": "string",
+          "example": "|h*ONPA 84-446"
+        },
+        "numberOfRenewals": {
+          "type": "integer",
+          "example": 0
+        },
+        "outDate": {
+          "type": "string",
+          "example": "2013-03-20"
+        },
+        "recallDate": {
+          "type": "string",
+          "example": "2013-03-20"
+        }
+      },
+      "type": "object"
+    },
+    "NewCheckoutRequest": {
+      "required": [
+        "patronBarcode",
+        "itemBarcode"
+      ],
+      "properties": {
+        "patronBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "NYPL"
+        },
+        "desiredDateDue": {
+          "type": "string",
+          "example": "2016-04-12T04:00:00.000-08:00"
+        }
+      },
+      "type": "object"
+    },
+    "NewHoldRequest": {
+      "title": "NewHoldRequest",
+      "properties": {
+        "patron": {
+          "type": "string",
+          "example": "6779366"
+        },
+        "nyplSource": {
+          "type": "string",
+          "example": "sierra-nypl"
+        },
+        "requestType": {
+          "type": "string",
+          "example": "hold"
+        },
+        "recordType": {
+          "type": "string",
+          "example": "i"
+        },
+        "record": {
+          "type": "string",
+          "example": "10011630"
+        },
+        "pickupLocation": {
+          "type": "string",
+          "example": "mal"
+        },
+        "deliveryLocation": {
+          "type": "string",
+          "example": "NW"
+        },
+        "neededBy": {
+          "type": "string",
+          "example": "2018-01-07T02:32:51Z"
+        },
+        "numberOfCopies": {
+          "type": "integer",
+          "example": "1"
+        },
+        "docDeliveryData": {
+          "$ref": "#\/definitions\/ElectronicDocumentData"
+        }
+      },
+      "type": "object"
+    },
+    "NewItem": {
+      "properties": {
+        "nyplSource": {
+          "type": "string",
+          "example": "sierra-nypl"
+        },
+        "bibIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "string",
+          "example": "17746307"
+        },
+        "nyplType": {
+          "type": "string",
+          "example": "item"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "deletedDate": {
+          "type": "string",
+          "example": "2008-12-24"
+        },
+        "deleted": {
+          "type": "boolean",
+          "example": false
+        },
+        "location": {
+          "$ref": "#\/definitions\/Location"
+        },
+        "status": {
+          "$ref": "#\/definitions\/ItemStatus"
+        },
+        "barcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "callNumber": {
+          "type": "string",
+          "example": "|h*ONPA 84-446"
+        },
+        "itemType": {
+          "type": "string",
+          "example": "Book, paperback"
+        },
+        "fixedFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/FixedField"
+          }
+        },
+        "varFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/VarField"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "NewJob": {
+      "properties": {
+        "successRedirectUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/item\/121"
+        },
+        "startCallbackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        },
+        "successCallbackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        },
+        "failureCallbackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        },
+        "updateCallbackUrl": {
+          "type": "string",
+          "example": "https:\/\/www.nypl.org\/callback"
+        }
+      },
+      "type": "object"
+    },
+    "NewPatronCheckout": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "13453452"
+        },
+        "item": {
+          "type": "string",
+          "example": "17746307"
+        },
+        "barcode": {
+          "type": "string",
+          "example": "33433001888415"
+        },
+        "dueDate": {
+          "type": "string",
+          "example": "2013-03-20"
+        },
+        "callNumber": {
+          "type": "string",
+          "example": "|h*ONPA 84-446"
+        },
+        "numberOfRenewals": {
+          "type": "integer",
+          "example": 0
+        },
+        "outDate": {
+          "type": "string",
+          "example": "2013-03-20"
+        },
+        "recallDate": {
+          "type": "string",
+          "example": "2013-03-20"
+        }
+      },
+      "type": "object"
+    },
+    "NewRecapCancelHoldRequest": {
+      "title": "NewRecapCancelHoldRequest",
+      "properties": {
+        "trackingId": {
+          "type": "string",
+          "example": "901bdd1d-bd8f-4310-ba31-7f13a55877fd"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "34333000000000"
+        },
+        "patronBarcode": {
+          "type": "string",
+          "example": "23333000000000"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "PUL"
+        }
+      },
+      "type": "object"
+    },
+    "NewRecapHoldRequest": {
+      "title": "NewRecapHoldRequest",
+      "properties": {
+        "trackingId": {
+          "type": "string",
+          "example": "901bdd1d-bd8f-4310-ba31-7f13a55877fd"
+        },
+        "patronBarcode": {
+          "type": "string",
+          "example": "23333000000000"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "34333000000000"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "PUL"
+        },
+        "description": {
+          "$ref": "#\/definitions\/ItemDescription"
+        }
+      },
+      "type": "object"
+    },
+    "NewRecapRecallRequest": {
+      "required": [
+        "owningInstitutionId",
+        "itemBarcode"
+      ],
+      "properties": {
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "PUL"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "33333259898217"
+        }
+      },
+      "type": "object"
+    },
+    "NewRecapRefileRequest": {
+      "required": [
+        "itemBarcode"
+      ],
+      "properties": {
+        "itemBarcode": {
+          "type": "string",
+          "example": "33333259898217"
+        }
+      },
+      "type": "object"
+    },
+    "NewRefileRequest": {
+      "title": "NewRefileRequest",
+      "properties": {
+        "itemBarcode": {
+          "type": "string",
+          "example": "1234567890"
+        }
+      },
+      "type": "object"
+    },
+    "NewSchema": {
+      "properties": {
+        "stream": {
+          "type": "string",
+          "example": "Bib"
+        },
+        "schema": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "Patron": {
+      "title": "Patron",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "5852922"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "deletedDate": {
+          "type": "string",
+          "example": "2008-12-24"
+        },
+        "deleted": {
+          "type": "boolean",
+          "example": false
+        },
+        "suppressed": {
+          "type": "boolean",
+          "example": false
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "barCodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expirationDate": {
+          "type": "string",
+          "example": "2017-08-20"
+        },
+        "homeLibraryCode": {
+          "type": "string",
+          "example": "lb"
+        },
+        "birthDate": {
+          "type": "string",
+          "example": "1978-10-15"
+        },
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fixedFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/FixedField"
+          }
+        },
+        "varFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/VarField"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "PatronBarcode": {
+      "title": "PatronBarcode",
+      "properties": {
+        "barCode": {
+          "type": "string",
+          "example": "25553095887111"
+        },
+        "name": {
+          "type": "string",
+          "example": "DEWEY, MELVILE"
+        },
+        "base64PngBarCode": {
+          "type": "string",
+          "example": "iVBORw0KGgoAAAANSUhEUgAAALUAAAAyCAIAAACVhA2eAAAAuUlEQVR4nO3SMQ"
+        },
+        "temporary": {
+          "type": "boolean",
+          "example": false
+        }
+      },
+      "type": "object"
+    },
+    "PatronResponse": {
+      "title": "PatronResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/Patron"
+        }
+      },
+      "type": "object"
+    },
+    "PatronsResponse": {
+      "title": "PatronsResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Patron"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "PostSchema": {
+      "title": "PostSchema",
+      "type": "object"
+    },
+    "RecapCancelHoldRequest": {
+      "title": "RecapCancelHoldRequest",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": "229"
+        },
+        "jobId": {
+          "type": "string",
+          "example": "991873slx938"
+        },
+        "processed": {
+          "type": "boolean",
+          "example": true
+        },
+        "success": {
+          "type": "boolean",
+          "example": false
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "trackingId": {
+          "type": "string",
+          "example": "901bdd1d-bd8f-4310-ba31-7f13a55877fd"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "34333000000000"
+        },
+        "patronBarcode": {
+          "type": "string",
+          "example": "23333000000000"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "PUL"
+        }
+      },
+      "type": "object"
+    },
+    "RecapCancelHoldRequestResponse": {
+      "title": "RecapHoldRequestResponse",
+      "properties": {
+        "data": [],
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "RecapDescription": {
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "example": "Some sing, some cry"
+        },
+        "author": {
+          "type": "string",
+          "example": "Ifa Bayeza"
+        },
+        "callNumber": {
+          "type": "string",
+          "example": "|h*ONPA 84-446"
+        }
+      },
+      "type": "object"
+    },
+    "RecapHoldRequest": {
+      "title": "RecapHoldRequest",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": "229"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "trackingId": {
+          "type": "string",
+          "example": "901bdd1d-bd8f-4310-ba31-7f13a55877fd"
+        },
+        "patronBarcode": {
+          "type": "string",
+          "example": "23333000000000"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "34333000000000"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "PUL"
+        },
+        "description": {
+          "$ref": "#\/definitions\/ItemDescription"
+        }
+      },
+      "type": "object"
+    },
+    "RecapHoldRequestResponse": {
+      "title": "RecapHoldRequestResponse",
+      "properties": {
+        "data": [],
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "RecapRecallRequest": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": 483
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "jobId": {
+          "type": "string",
+          "example": "5aaa1212cd"
+        },
+        "owningInstitutionId": {
+          "type": "string",
+          "example": "PUL"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "33333259898217"
+        }
+      },
+      "type": "object"
+    },
+    "RecapRecallRequestResponse": {
+      "title": "RecapRecallRequestResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/RecapRecallRequest"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "RecapRefileRequest": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": 483
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2008-12-24T03:16:00Z"
+        },
+        "jobId": {
+          "type": "string",
+          "example": "5aaa1212cd"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "33333259898217"
+        }
+      },
+      "type": "object"
+    },
+    "RecapRefileRequestResponse": {
+      "title": "RecapRefileRequestResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/RecapRecallRequest"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "RefileRequest": {
+      "title": "RefileRequest",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": "229"
+        },
+        "jobId": {
+          "type": "string",
+          "example": "991873slx938"
+        },
+        "success": {
+          "type": "boolean",
+          "example": false
+        },
+        "createdDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "updatedDate": {
+          "type": "string",
+          "example": "2016-01-07T02:32:51Z"
+        },
+        "itemBarcode": {
+          "type": "string",
+          "example": "1234567890"
+        }
+      },
+      "type": "object"
+    },
+    "RefileRequestResponse": {
+      "title": "RefileRequestResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/RefileRequest"
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Resource": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "RDF type(s), e.g. \"nypl:Item\", \"nypl:Resource\""
+        },
+        "@id": {
+          "type": "string",
+          "description": "ID, e.g. \"res:105173159\""
+        },
+        "carrierType": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/EntityStub"
+          }
+        },
+        "creatorLiteral": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Creator literals"
+        },
+        "contributorLiteral": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Contributor literals"
+        },
+        "created": {
+          "type": "string",
+          "description": "Raw, unparsed date string"
+        },
+        "createdYear": {
+          "type": "integer",
+          "description": "Year of creation"
+        },
+        "dateStartYear": {
+          "type": "integer",
+          "description": "Start of relevant year range"
+        },
+        "depiction": {
+          "type": "string",
+          "description": "URL of an image for the resource"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of resource"
+        },
+        "endYear": {
+          "type": "integer",
+          "description": "Ending year of coverage"
+        },
+        "extent": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Extent (e.g. page count)"
+        },
+        "holdingCount": {
+          "type": "integer",
+          "description": "Rough number of copies across institutions"
+        },
+        "issuance": {
+          "type": "array",
+          "description": "Issuance",
+          "items": {
+            "$ref": "#\/definitions\/EntityStub"
+          }
+        },
+        "items": {
+          "type": "array",
+          "description": "Array of items attached to this bib",
+          "items": {
+            "$ref": "#\/definitions\/Item"
+          }
+        },
+        "^id": {
+          "type": "string",
+          "description": "Various identifiers given as 'idAcqnum', 'idBarcode', 'idBnum', 'idCallNum', 'idCatnyp', 'idDcc', 'idExhib', 'idHathi', 'idIsbn', 'idIssn', 'idLcc', 'idLccCoarse', 'idMmmsDb', 'idMss', 'idObjNum', 'idOclc', 'idOwi', 'idRlin', 'idUuid'"
+        },
+        "language": {
+          "type": "array",
+          "description": "Language(s), if known",
+          "items": {
+            "$ref": "#\/definitions\/EntityStub"
+          }
+        },
+        "materialType": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/EntityStub"
+          }
+        },
+        "mediaType": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/EntityStub"
+          }
+        },
+        "note": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Note fields"
+        },
+        "numAvailable": {
+          "type": "integer",
+          "description": "Number of items available"
+        },
+        "placeOfPublication": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prefLabel": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Best title(s)"
+        },
+        "roles:ROLE": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Contributor literals by ROLE"
+        },
+        "startYear": {
+          "type": "integer",
+          "description": "Beggining year of coverage"
+        },
+        "subject": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/EntityStub"
+          }
+        },
+        "suppressed": {
+          "type": "boolean",
+          "description": "Indicates whether or not resource should be suppressed from view"
+        },
+        "title": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Title(s)"
+        },
+        "titleDisplay": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Display title(s)"
+        },
+        "type": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "nypl:Item",
+              "nypl:Collection"
+            ]
+          }
+        },
+        "uri": {
+          "type": "string",
+          "description": "Internal identifier for resource"
+        }
+      }
+    },
+    "ResourceAggregationResponse": {
+      "type": "object",
+      "properties": {
+        "@context": {
+          "type": "string",
+          "format": "url",
+          "description": "URL for JSONLD doc mapping short-hand property names to IRIs"
+        },
+        "@type": {
+          "type": "string",
+          "enum": [
+            "itemListElement"
+          ]
+        },
+        "item": {
+          "$ref": "#\/definitions\/Aggregation"
+        }
+      }
+    },
+    "ResourceAggregationsResponse": {
+      "type": "object",
+      "properties": {
+        "@context": {
+          "type": "string",
+          "format": "url",
+          "description": "URL for JSONLD doc mapping short-hand property names to IRIs"
+        },
+        "@type": {
+          "type": "string",
+          "enum": [
+            "itemListElement"
+          ]
+        },
+        "@id": {
+          "type": "string",
+          "description": "ID, e.g. \"language\""
+        },
+        "itemListElement": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Aggregation"
+          }
+        }
+      }
+    },
+    "ResourceError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "string"
+        }
+      }
+    },
+    "ResourceResult": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "enum": [
+            "searchResult"
+          ]
+        },
+        "result": {
+          "$ref": "#\/definitions\/Resource"
+        }
+      }
+    },
+    "ResourcesResponse": {
+      "type": "object",
+      "properties": {
+        "@context": {
+          "type": "string",
+          "format": "url",
+          "description": "URL for JSONLD doc mapping short-hand property names to IRIs"
+        },
+        "@type": {
+          "type": "string",
+          "enum": [
+            "itemList"
+          ]
+        },
+        "itemListElement": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/ResourceResult"
+          }
+        }
+      }
+    },
+    "RetrievalRequestTest": {
+      "properties": {
+        "recordType": {
+          "type": "string",
+          "example": "bib"
+        },
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "Schema": {
+      "title": "Schema",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer",
+          "example": 1
+        },
+        "offsetBegin": {
+          "type": "integer",
+          "example": 0
+        },
+        "offsetEnd": {
+          "type": "integer",
+          "example": 123
+        },
+        "schemaObject": {
+          "type": "object"
+        },
+        "stream": {
+          "type": "string",
+          "example": "Bib"
+        },
+        "schema": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "SchemaResponse": {
+      "title": "SchemaResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/Schema"
+        }
+      },
+      "type": "object"
+    },
+    "SchemasResponse": {
+      "title": "SchemasResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/Schema"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "SimpleBib": {
+      "title": "SimpleBib",
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "17746307"
+        },
+        "title": {
+          "type": "string",
+          "example": "Harry Potter and the Chamber of Secrets"
+        },
+        "author": {
+          "type": "string",
+          "example": "Rowling, J. K."
+        },
+        "materialType": {
+          "type": "string",
+          "example": "E-AUDIOBOOK"
+        },
+        "publishYear": {
+          "type": "integer",
+          "example": 1999
+        },
+        "publisher": {
+          "type": "string",
+          "example": "OverDrive, Inc."
+        },
+        "language": {
+          "type": "string",
+          "example": "Korean"
+        },
+        "isbns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "SimpleBibsResponse": {
+      "title": "BibsResponse",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/SimpleBib"
+          }
+        },
+        "debugInfo": {
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "SubField": {
+      "required": [
+        "tag"
+      ],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "example": "a"
+        },
+        "content": {
+          "type": "string",
+          "example": "Wizards"
+        }
+      },
+      "type": "object"
+    },
+    "TokenInformation": {
+      "title": "TokenInformation",
+      "properties": {
+        "decodedToken": {
+          "$ref": "#\/definitions\/DecodedToken"
+        },
+        "patron": {
+          "$ref": "#\/definitions\/AuthPatron"
+        }
+      },
+      "type": "object"
+    },
+    "TokenResponse": {
+      "title": "TokenResponse",
+      "properties": {
+        "data": {
+          "$ref": "#\/definitions\/TokenInformation"
+        }
+      },
+      "type": "object"
+    },
+    "VarField": {
+      "required": [
+        "fieldTag"
+      ],
+      "properties": {
+        "fieldTag": {
+          "type": "string",
+          "example": "a"
+        },
+        "marcTag": {
+          "type": "string",
+          "example": "100"
+        },
+        "ind1": {
+          "type": "string",
+          "example": "1"
+        },
+        "ind2": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "subFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#\/definitions\/SubField"
+          }
+        }
+      },
+      "type": "object"
+    }
+  }
+}
